@@ -1,0 +1,28 @@
+{
+    "name": "@u1bot/koishi-plugin-ddcheck",
+    "description": "成分姬",
+    "version": "0.0.1",
+    "main": "lib/index.js",
+    "typings": "lib/index.d.ts",
+    "files": [
+        "lib",
+        "dist"
+    ],
+    "license": "MIT",
+    "keywords": [
+        "chatbot",
+        "koishi",
+        "plugin"
+    ],
+    "peerDependencies": {
+        "koishi": "^4.18.7"
+    },
+    "devDependencies": {
+        "koishi-plugin-cron": "^3.1.0",
+        "koishi-plugin-html-renderer": "workspace:^"
+    },
+    "dependencies": {
+        "koishi-plugin-bilibili-login": "^0.1.50",
+        "axios": "^1.10.0"
+    }
+}
