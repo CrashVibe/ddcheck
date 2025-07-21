@@ -1,26 +1,26 @@
-import { Context, Schema, h } from 'koishi';
-import { getMedalList, getUserInfo, getVtbList, renderDdcheckImage, updateVtbList } from './data_source';
-import {} from 'koishi-plugin-cron';
-export const name = 'ddcheck';
-export const inject = ['html_renderer', 'BiliBiliLogin', 'BiliBiliSearch', 'cron'];
+import { Context, Schema, h } from "koishi";
+import { getMedalList, getUserInfo, getVtbList, renderDdcheckImage, updateVtbList } from "./data_source";
+import {} from "koishi-plugin-cron";
+export const name = "ddcheck";
+export const inject = ["html_renderer", "BiliBiliLogin", "BiliBiliSearch", "cron"];
 
 export interface Config {}
 
 export const Config: Schema<Config> = Schema.object({});
 
 export function apply(ctx: Context, config: Config) {
-    ctx.cron('0 0 0 * * *', async () => {
+    ctx.cron("0 0 0 * * *", async () => {
         await updateVtbList(ctx);
     });
-    ctx.command('查成分 <name:text>', '查询B站用户关注的VTuber成分').action(async ({ session }, name) => {
+    ctx.command("查成分 <name:text>", "查询B站用户关注的VTuber成分").action(async ({ session }, name) => {
         if (!name) {
-            return '请输入B站用户名或UID';
+            return "请输入B站用户名或UID";
         }
         let uid: number | undefined = undefined;
         if (/^\d+$/.test(name)) {
             uid = Number(name);
         } else {
-            uid = await ctx.BiliBiliSearch.getSearchRequestByType('bili_user', name).then((result) => {
+            uid = await ctx.BiliBiliSearch.getSearchRequestByType("bili_user", name).then((result) => {
                 if (result?.data?.result?.length) {
                     return (result.data.result[0] as { mid: number }).mid;
                 }
@@ -34,11 +34,11 @@ export function apply(ctx: Context, config: Config) {
             fetchedUserInfo = await getUserInfo(ctx, uid);
         } catch (error) {
             ctx.logger.error(`获取用户信息失败: ${error}`);
-            return '获取用户信息失败，请检查名称或稍后再试';
+            return "获取用户信息失败，请检查名称或稍后再试";
         }
         const vtbList = await getVtbList(ctx);
         if (!vtbList.length) {
-            return '获取VTB列表失败，请稍后再试';
+            return "获取VTB列表失败，请稍后再试";
         }
         const medalList = await getMedalList(ctx, uid);
         let image;
@@ -46,8 +46,8 @@ export function apply(ctx: Context, config: Config) {
             image = await renderDdcheckImage(fetchedUserInfo, vtbList, medalList, ctx);
         } catch (error) {
             ctx.logger.error(`生成图片失败: ${error}`);
-            return '生成图片失败，请稍后再试';
+            return "生成图片失败，请稍后再试";
         }
-        return h.image(image, 'image/png');
+        return h.image(image, "image/png");
     });
 }

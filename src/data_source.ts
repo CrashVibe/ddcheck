@@ -1,11 +1,11 @@
-import * as fsa from 'fs/promises';
-import * as fs from 'fs';
-import * as path from 'path';
-import axios from 'axios';
-import { Context, Logger, Model } from 'koishi';
-import {} from 'koishi-plugin-html-renderer/src';
-import {} from 'koishi-plugin-bilibili-login';
-import { SendFetch } from 'koishi-plugin-bilibili-login/lib/API/BiliBiliAPI/';
+import * as fsa from "fs/promises";
+import * as fs from "fs";
+import * as path from "path";
+import axios from "axios";
+import { Context, Logger, Model } from "koishi";
+import {} from "koishi-plugin-html-renderer/src";
+import {} from "koishi-plugin-bilibili-login";
+import { SendFetch } from "koishi-plugin-bilibili-login/lib/API/BiliBiliAPI/";
 
 interface API_CONFIG {
     name: string;
@@ -16,14 +16,14 @@ interface API_CONFIG {
 
 const API_CONFIGS: API_CONFIG[] = [
     {
-        name: 'biligame',
-        url: 'https://line3-h5-mobile-api.biligame.com/game/center/h5/user/relationship/following_list',
+        name: "biligame",
+        url: "https://line3-h5-mobile-api.biligame.com/game/center/h5/user/relationship/following_list",
         max_pages: 200,
         priority: 1
     },
     {
-        name: 'app.biliapi.net',
-        url: 'https://app.biliapi.net/x/v2/relation/followings',
+        name: "app.biliapi.net",
+        url: "https://app.biliapi.net/x/v2/relation/followings",
         max_pages: 5,
         priority: 2
     }
@@ -32,7 +32,7 @@ const API_CONFIGS: API_CONFIG[] = [
 const PAGE_SIZE = 50;
 class BiliBiliUserAPI extends SendFetch {
     public async getUserMedals(uid: number): Promise<any[]> {
-        const url = 'https://api.live.bilibili.com/xlive/web-ucenter/user/MedalWall';
+        const url = "https://api.live.bilibili.com/xlive/web-ucenter/user/MedalWall";
         const params = new URLSearchParams({ target_id: uid.toString() });
         const response = await this.sendGet(url, params, this.returnBilibiliHeaders());
         if (response.ok) {
@@ -45,11 +45,11 @@ class BiliBiliUserAPI extends SendFetch {
     }
 
     public async getUserBasicInfo(uid: number): Promise<UserBasicInfo> {
-        const defaultInfo = { name: `用户${uid}`, face: '', follower: 0, following: 0 };
+        const defaultInfo = { name: `用户${uid}`, face: "", follower: 0, following: 0 };
 
         // 主API请求：获取完整信息
         try {
-            const url = 'https://api.bilibili.com/x/web-interface/card';
+            const url = "https://api.bilibili.com/x/web-interface/card";
             const params = new URLSearchParams({ mid: uid.toString() });
             const response = await this.sendGet(url, params, this.returnBilibiliHeaders());
             console.info(`请求用户信息: ${url}?${params.toString()}`);
@@ -64,16 +64,16 @@ class BiliBiliUserAPI extends SendFetch {
                         following: following || defaultInfo.following
                     };
                 }
-                this.logger.warn('主API获取用户信息失败:', data.message || `错误码 ${data.code}`);
+                this.logger.warn("主API获取用户信息失败:", data.message || `错误码 ${data.code}`);
             }
         } catch (e) {
-            this.logger.warn('主API请求异常:', e);
+            this.logger.warn("主API请求异常:", e);
         }
 
         // 备用API请求：补充关注数
         try {
-            const url = 'https://app.biliapi.net/x/v2/relation/followings ';
-            const params = new URLSearchParams({ vmid: uid.toString(), pn: '1', ps: '1' });
+            const url = "https://app.biliapi.net/x/v2/relation/followings ";
+            const params = new URLSearchParams({ vmid: uid.toString(), pn: "1", ps: "1" });
             const response = await this.sendGet(url, params, this.returnBilibiliHeaders());
 
             if (response.ok) {
@@ -81,11 +81,11 @@ class BiliBiliUserAPI extends SendFetch {
                 if (data.code === 0) {
                     defaultInfo.following = data.data?.total || 0;
                 } else {
-                    this.logger.warn('备用API获取关注数失败:', data.message || `错误码 ${data.code}`);
+                    this.logger.warn("备用API获取关注数失败:", data.message || `错误码 ${data.code}`);
                 }
             }
         } catch (e) {
-            this.logger.warn('备用API请求异常:', e);
+            this.logger.warn("备用API请求异常:", e);
         }
 
         return defaultInfo;
@@ -108,7 +108,7 @@ class BiliBiliUserAPI extends SendFetch {
                 if (followings.length > bestResult.length) {
                     [bestResult, bestApiName] = [followings, api.name];
                 }
-                if ((api.name === 'biligame' && followings.length > 1000) || followings.length >= 500) {
+                if ((api.name === "biligame" && followings.length > 1000) || followings.length >= 500) {
                     break;
                 }
             } catch (e) {
@@ -195,7 +195,7 @@ export interface UserInfo {
 export async function getUserInfo(ctx: Context, uid: number): Promise<UserInfo> {
     const sendFetch = new BiliBiliUserAPI(await ctx.BiliBiliLogin.getBilibiliAccountData());
 
-    const defaultBasicInfo: UserBasicInfo = { name: `用户${uid}`, face: '', follower: 0, following: 0 };
+    const defaultBasicInfo: UserBasicInfo = { name: `用户${uid}`, face: "", follower: 0, following: 0 };
     let basic_info: UserBasicInfo = defaultBasicInfo;
     let followings: number[] = [];
 
@@ -218,7 +218,7 @@ export async function getUserInfo(ctx: Context, uid: number): Promise<UserInfo> 
 }
 
 function formatColor(color: number): string {
-    return `#${color.toString(16).padStart(6, '0').toUpperCase()}`;
+    return `#${color.toString(16).padStart(6, "0").toUpperCase()}`;
 }
 
 function formatVtbInfo(info: any, medalDict: Record<string, any>): any {
@@ -271,14 +271,14 @@ export async function renderDdcheckImage(
         vtbs,
         num_per_col
     };
-    const templateDir = path.resolve(__dirname, 'templates');
-    const templatePath = path.join(templateDir, 'info.ejs');
+    const templateDir = path.resolve(__dirname, "templates");
+    const templatePath = path.join(templateDir, "info.ejs");
     if (!fs.existsSync(templatePath)) {
         throw new Error(`模板文件不存在: ${templatePath}`);
     }
     return await ctx.html_renderer.render_template_html_file(
         templateDir,
-        'info.ejs',
+        "info.ejs",
         { info: info },
         {
             viewport: { width: 100, height: 100 },
@@ -294,10 +294,10 @@ export interface VtbInfo {
 }
 
 const VTB_LIST_URLS = [
-    'https://api.vtbs.moe/v1/short',
-    'https://cfapi.vtbs.moe/v1/short',
-    'https://hkapi.vtbs.moe/v1/short',
-    'https://kr.vtbs.moe/v1/short'
+    "https://api.vtbs.moe/v1/short",
+    "https://cfapi.vtbs.moe/v1/short",
+    "https://hkapi.vtbs.moe/v1/short",
+    "https://kr.vtbs.moe/v1/short"
 ];
 
 export async function updateVtbList(ctx: Context): Promise<void> {
@@ -318,7 +318,7 @@ export async function updateVtbList(ctx: Context): Promise<void> {
             }
             break;
         } catch (e: any) {
-            if (e.code === 'ECONNABORTED') {
+            if (e.code === "ECONNABORTED") {
                 console.warn(`Get ${url} timeout`);
             } else {
                 console.warn(`Error when getting ${url}, ignore`, e);
@@ -329,18 +329,18 @@ export async function updateVtbList(ctx: Context): Promise<void> {
 }
 
 function getVtbListPath(ctx: Context): string {
-    return path.join(ctx.baseDir, 'data', 'ddcheck', 'vtb_list.json');
+    return path.join(ctx.baseDir, "data", "ddcheck", "vtb_list.json");
 }
 
 export async function loadVtbList(ctx: Context): Promise<VtbInfo[]> {
     const VTB_LIST_PATH = getVtbListPath(ctx);
     try {
         await fsa.access(VTB_LIST_PATH);
-        const raw = await fsa.readFile(VTB_LIST_PATH, 'utf-8');
+        const raw = await fsa.readFile(VTB_LIST_PATH, "utf-8");
         return JSON.parse(raw);
     } catch (e) {
-        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
-            console.warn('vtb列表解析错误，将重新获取');
+        if ((e as NodeJS.ErrnoException).code !== "ENOENT") {
+            console.warn("vtb列表解析错误，将重新获取");
             try {
                 await fsa.unlink(VTB_LIST_PATH);
             } catch {}
@@ -352,7 +352,7 @@ export async function loadVtbList(ctx: Context): Promise<VtbInfo[]> {
 export async function dumpVtbList(ctx: Context, vtbList: VtbInfo[]): Promise<void> {
     const VTB_LIST_PATH = getVtbListPath(ctx);
     await fsa.mkdir(path.dirname(VTB_LIST_PATH), { recursive: true });
-    await fsa.writeFile(VTB_LIST_PATH, JSON.stringify(vtbList, null, 4), 'utf-8');
+    await fsa.writeFile(VTB_LIST_PATH, JSON.stringify(vtbList, null, 4), "utf-8");
 }
 
 export async function getVtbList(ctx: Context): Promise<VtbInfo[]> {
