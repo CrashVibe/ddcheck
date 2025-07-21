@@ -22,7 +22,7 @@
         "koishi-plugin-html-renderer": "workspace:^"
     },
     "dependencies": {
-        "koishi-plugin-bilibili-login": "^0.1.50",
-        "axios": "^1.10.0"
+        "axios": "^1.10.0",
+        "koishi-plugin-bilibili-login": "^0.1.50"
     }
 }
