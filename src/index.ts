@@ -9,7 +9,7 @@ export interface Config {}
 export const Config: Schema<Config> = Schema.object({});
 
 export function apply(ctx: Context, config: Config) {
-    ctx.cron("0 0 0 * * *", async () => {
+    ctx.cron("0 0 */3 * * *", async () => {
         await updateVtbList(ctx);
     });
     ctx.command("查成分 <name:text>", "查询B站用户关注的VTuber成分").action(async ({ session }, name) => {
