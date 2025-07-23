@@ -1,8 +1,7 @@
 import * as fsa from "fs/promises";
-import * as fs from "fs";
 import * as path from "path";
 import axios from "axios";
-import { Context, Logger, Model } from "koishi";
+import { Context } from "koishi";
 import {} from "koishi-plugin-html-renderer/src";
 import {} from "koishi-plugin-bilibili-login";
 import { SendFetch } from "koishi-plugin-bilibili-login/lib/API/BiliBiliAPI/";
@@ -272,17 +271,13 @@ export async function renderDdcheckImage(
         num_per_col
     };
     const templateDir = path.resolve(__dirname, "templates");
-    const templatePath = path.join(templateDir, "info.ejs");
-    if (!fs.existsSync(templatePath)) {
-        throw new Error(`模板文件不存在: ${templatePath}`);
-    }
     return await ctx.html_renderer.render_template_html_file(
         templateDir,
         "info.ejs",
         { info: info },
         {
             viewport: { width: 100, height: 100 },
-            base_url: templatePath
+            base_url: `file://${templateDir}/`
         }
     );
 }
